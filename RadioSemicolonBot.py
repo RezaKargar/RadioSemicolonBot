@@ -83,6 +83,13 @@ while 1:
             message = update['message']
             chat_id = message['chat']['id']
 
+            if 'text' in message and message['text'] == '/ping':
+                api('sendMessage', {
+                    'chat_id': chat_id,
+                    'reply_to_message_id': message['message_id'],
+                    'text': 'Pong',
+                })
+
             if 'new_chat_member' in message or 'left_chat_member' in message:
                 api('deleteMessage', {
                     'chat_id': chat_id,
