@@ -1,7 +1,7 @@
 import requests, json, time, os
 
 BASE_URL = 'https://api.telegram.org/bot'
-TOKEN = os.environ['RADIO_SEMICOLON_BOT_TOKEN']
+TOKEN = '{{BOT_TOKEN}}'
 LOG_DIRECTORY =  os.getcwd() + '/logs'
 
 last_update_id = 0
