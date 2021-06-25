@@ -85,16 +85,25 @@ if len(consoles) > 0:
 
 created_console = Post('consoles', {'executable': 'python3.6', 'arguments': f'{FILE_NAME}', 'working_directory': None})
 
-print(created_console)
 
+                      #########################
+###################### Starting the new console ######################
+                      #########################
+
+# In order to the new created console starts to work, it must be opened
+# throw a browser so in the block of code we will open a selenium browser
+# navigate to url of console
+
+# Creating a virtual display which selenium's browser will use
 display = Display(visible=0, size=(800, 600))
 display.start()
 
+# Creating the selenium browser and navigate to console's url
 driver = webdriver.Chrome()
-
 driver.get(f'{PYTHONANYWHERE_ADDRESS}{created_console["console_url"]}')
 sleep(2)
 
+# Providing the credentials on login page and loging-in
 username_input = driver.find_element_by_name("auth-username")
 username_input.send_keys(PYTHONANYWHERE_USERNAME)
 
@@ -103,10 +112,8 @@ password_input.send_keys(PYTHONANYWHERE_PASSWORD)
 
 login_button = driver.find_element_by_id("id_next")
 login_button.click()
-
 sleep(4)
 
-print(driver.title)
+# Quite the selenium browser and stop the virtual display
 driver.quit()
-
 display.stop()
