@@ -34,7 +34,7 @@ jobs:
         run: |
          sed -i 's/{{PYTHONANYWHERE_USERNAME}}/${{ secrets.PYTHONANYWHERE_USERNAME }}/g' .pythonanywhere_deploy_scripts/deployToPythonAnyWhere.py
          sed -i 's/{{PYTHONANYWHERE_PASSWORD}}/${{ secrets.PYTHONANYWHERE_PASSWORD }}/g' .pythonanywhere_deploy_scripts/deployToPythonAnyWhere.py
-         sed -i 's/{{BOT_TOKEN}}/${{ secrets.BOT_TOKEN }}/g' .pythonanywhere_deploy_scripts/deployToPythonAnyWhere.py
+         sed -i 's/{{PYTHONANYWHERE_TOKEN}}/${{ secrets.PYTHONANYWHERE_TOKEN }}/g' .pythonanywhere_deploy_scripts/deployToPythonAnyWhere.py
          sed -i 's/{{BOT_TOKEN}}/${{ secrets.BOT_TOKEN }}/g' RadioSemicolonBot.py
          
       - name: Run deployToPythonAnyWhere for actual deploy
