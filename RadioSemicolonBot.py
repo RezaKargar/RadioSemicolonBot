@@ -1,8 +1,11 @@
 import requests, json, time, os
+from datetime import datetime
 
 BASE_URL = 'https://api.telegram.org/bot'
 TOKEN = '{{BOT_TOKEN}}'
 LOG_DIRECTORY =  os.getcwd() + '/logs'
+
+BOT_USERNAME = "radiosemicolonbot"
 
 last_update_id = 0
 time_stamps_of_removed_users_log_files = [int(time.time())]
@@ -11,6 +14,9 @@ time_stamps_of_errors_log_files = [int(time.time())]
 def log(text, isError = False):
     global time_stamps_of_removed_users_log_files
     
+    time_of_log = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    text = f"{time_of_log} - {text}"
+
     if not os.path.exists(LOG_DIRECTORY):
         os.makedirs(LOG_DIRECTORY)
     
@@ -101,21 +107,24 @@ while 1:
                     'chat_id': message['new_chat_member']['id']
                 })['result']
                 
-                username = new_chat_member_info['username']
-                user_id = new_chat_member_info['id']
-                
-                
-                if 'bot' in username.lower():
-                    print(f'Bot: @{username}')
-                    log(f'Bot: @{username}')
+                if 'username' in new_chat_member_info:
+                    username = new_chat_member_info['username'].lower()
+                    user_id = new_chat_member_info['id']
                     
-                    api('kickChatMember', {
-                        'chat_id': chat_id,
-                        'user_id': user_id,
-                        'until_date': 0 #Forever
-                    })
+                    if username == BOT_USERNAME:
+                        continue
                     
-                    continue
+                    if 'bot' in username:
+                        print(f'Bot: @{username}')
+                        log(f'Bot: @{username}')
+                        
+                        api('kickChatMember', {
+                            'chat_id': chat_id,
+                            'user_id': user_id,
+                            'until_date': 0 #Forever
+                        })
+                        
+                        continue
                 
                 
                 if 'bio' not in new_chat_member_info:
@@ -145,7 +154,6 @@ while 1:
                     })
 
     except Exception as e:
-        print("Exception:")
-        print(str(e))
+        print(f"Exception: {e}")
         log(str(e), True)
         time.sleep(10)
