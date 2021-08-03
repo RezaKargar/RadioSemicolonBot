@@ -1,4 +1,4 @@
-import requests, json, time, os
+import requests, json, time, os, re
 from datetime import datetime
 
 BASE_URL = 'https://api.telegram.org/bot'
@@ -63,6 +63,71 @@ def api(method, data = None):
     response = requests.post(BASE_URL + TOKEN + '/' + method, json=data)
     return json.loads(response.content)
 
+def extract_emojis(text):
+    emoji_pattern = re.compile(
+        "["
+            u"\U0001F600-\U0001F64F"
+            u"\U0001F300-\U0001F5FF"
+            u"\U0001F680-\U0001F6FF"
+            u"\U0001F1E0-\U0001F1FF"
+            u"\U00002500-\U00002BEF"
+            u"\U00002702-\U000027B0"
+            u"\U00002702-\U000027B0"
+            u"\U000024C2-\U0001F251"
+            u"\U0001f926-\U0001f937"
+            u"\U00010000-\U0010ffff"
+            u"\u2640-\u2642" 
+            u"\u2600-\u2B55"
+            u"\u200d"
+            u"\u23cf"
+            u"\u23e9"
+            u"\u231a"
+            u"\ufe0f"
+            u"\u3030"
+        "]", flags=re.UNICODE)
+    return re.findall(emoji_pattern, text)
+
+def extract_diacritical_marks_or_arabic_letters(text):
+    diacritical_marks_pattern = re.compile("[أؤكيةًٌٍَّ]")
+    return re.findall(diacritical_marks_pattern, text)
+
+def has_whats_up_link(text):
+    whats_up_link_pattern = re.compile("(https?://)?wa.me")
+    links = re.findall(whats_up_link_pattern, text)
+    return len(links) > 0
+
+def is_arabic_spam(text):
+    """
+        This function is for detecting if a text is an Arabic spam text
+        
+        The four conditions that make a text Arabic spam:
+        1. Having length of more than 1000 characters
+        2. Including more than 10 emojis
+        3. Including more than 10 diacritical marks or arabic letters
+        4. Including a Whats up link
+
+        The condition 2 and 3 are more important
+    """
+    
+    emojis_of_text = extract_emojis(text)
+    diacritical_marks_or_arabic_letters = extract_diacritical_marks_or_arabic_letters(text)
+    is_any_whats_up_link_in_text = extract_emojis(text)
+
+    count_of_conditons_failed = 0
+
+    if len(text) > 1000:
+        count_of_conditons_failed += 1
+
+    if len(emojis_of_text) > 10:
+        count_of_conditons_failed += 2
+
+    if len(diacritical_marks_or_arabic_letters) > 50:
+        count_of_conditons_failed += 2
+
+    if is_any_whats_up_link_in_text:
+        count_of_conditons_failed += 1
+
+    return count_of_conditons_failed > 2
 
 remove_old_log_files()
 
@@ -89,12 +154,35 @@ while 1:
             message = update['message']
             chat_id = message['chat']['id']
 
-            if 'text' in message and message['text'] == '/ping':
-                api('sendMessage', {
-                    'chat_id': chat_id,
-                    'reply_to_message_id': message['message_id'],
-                    'text': 'Pong',
-                })
+            if 'text' in message:
+                if message['text'] == '/ping':
+                    api('sendMessage', {
+                        'chat_id': chat_id,
+                        'reply_to_message_id': message['message_id'],
+                        'text': 'Pong',
+                    })
+
+                if is_arabic_spam(message['text']):
+                    api('deleteMessage', {
+                        'chat_id': chat_id,
+                        'message_id': message['message_id']
+                    })
+                    
+                    api('kickChatMember', {
+                        'chat_id': chat_id,
+                        'user_id': user_id,
+                        'until_date': 0 #Forever
+                    })
+
+                    spammer_first_name = message['chat']['first_name']
+                    spammer_last_name = message['chat']['last_name']
+                    spammer_user_name = message['chat']['username']
+                    
+                    print(f'Spammer: @{spammer_user_name} {spammer_first_name} {spammer_last_name}')
+                    log(f'Spammer: @{spammer_user_name} {spammer_first_name} {spammer_last_name}')
+                    log(f'Spam Text: {message["text"]}')
+                    
+                    continue
 
             if 'new_chat_member' in message or 'left_chat_member' in message:
                 api('deleteMessage', {
@@ -146,7 +234,7 @@ while 1:
                     
                     print(f'Spammer: @{spammer_user_name} {spammer_first_name} {spammer_last_name}')
                     log(f'Spammer: @{spammer_user_name} {spammer_first_name} {spammer_last_name}')
-                    
+
                     api('kickChatMember', {
                         'chat_id': chat_id,
                         'user_id': user_id,
