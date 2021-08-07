@@ -111,7 +111,7 @@ def is_arabic_spam(text):
     
     emojis_of_text = extract_emojis(text)
     diacritical_marks_or_arabic_letters = extract_diacritical_marks_or_arabic_letters(text)
-    is_any_whats_up_link_in_text = extract_emojis(text)
+    is_any_whats_up_link_in_text = has_whats_up_link(text)
 
     count_of_conditons_failed = 0
 
