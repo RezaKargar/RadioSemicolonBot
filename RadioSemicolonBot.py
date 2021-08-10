@@ -153,6 +153,7 @@ while 1:
             
             message = update['message']
             chat_id = message['chat']['id']
+            user_id = message['from']['id']
 
             if 'text' in message:
                 if message['text'] == '/ping':
@@ -174,9 +175,9 @@ while 1:
                         'until_date': 0 #Forever
                     })
 
-                    spammer_first_name = message['chat']['first_name']
-                    spammer_last_name = message['chat']['last_name']
-                    spammer_user_name = message['chat']['username']
+                    spammer_first_name = message['from']['first_name']
+                    spammer_last_name = message['from']['last_name']
+                    spammer_user_name = message['from']['username']
                     
                     print(f'Spammer: @{spammer_user_name} {spammer_first_name} {spammer_last_name}')
                     log(f'Spammer: @{spammer_user_name} {spammer_first_name} {spammer_last_name}')
