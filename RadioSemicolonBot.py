@@ -1,4 +1,4 @@
-import requests, json, time, os, re
+import requests, json, time, os, re, traceback
 from datetime import datetime
 
 BASE_URL = 'https://api.telegram.org/bot'
@@ -243,6 +243,6 @@ while 1:
                     })
 
     except Exception as e:
-        print(f"Exception: {e}")
-        log(str(e), True)
+        print(f"Exception: {traceback.format_exc()}")
+        log(traceback.format_exc(), True)
         time.sleep(10)
