@@ -138,24 +138,27 @@ while 1:
         updates = api('getUpdates', {
             'offset': last_update_id + 1,
             'timeout': 40
-        })['result']
+        }).get('result')
+
+        if not updates or not len(updates):
+            continue
 
         print(f'updates count : { len(updates) }')
-
-        if not len(updates):
-            continue
 
         last_update_id = int(updates[-1]['update_id'])
 
         for update in updates:
             if 'message' not in update:
                 continue
-            
+
             message = update['message']
             chat_id = message['chat']['id']
             user_id = message['from']['id']
 
-            if 'text' in message:
+            if 'text' in message or 'caption' in message:
+                # Messages which has file, instead of 'text' key they have 'caption' key
+                message['text'] = message.get('caption') if 'text' not in message else message['text']
+
                 if message['text'] == '/ping':
                     api('sendMessage', {
                         'chat_id': chat_id,
@@ -175,9 +178,14 @@ while 1:
                         'until_date': 0 #Forever
                     })
 
-                    spammer_first_name = message['from']['first_name']
-                    spammer_last_name = message['from']['last_name']
-                    spammer_user_name = message['from']['username']
+                    spammer_first_name = message['from'].get('first_name')
+                    spammer_first_name = spammer_first_name if spammer_first_name else "HAS_NO_FIRSTNAME"
+
+                    spammer_last_name = message['from'].get('last_name')
+                    spammer_last_name = spammer_last_name if spammer_last_name else "HAS_NO_LASTNAME"
+                    
+                    spammer_user_name = message['from'].get('username')
+                    spammer_user_name = spammer_user_name if spammer_user_name else "HAS_NO_USERNAME"
                     
                     print(f'Spammer: @{spammer_user_name} {spammer_first_name} {spammer_last_name}')
                     log(f'Spammer: @{spammer_user_name} {spammer_first_name} {spammer_last_name}')
