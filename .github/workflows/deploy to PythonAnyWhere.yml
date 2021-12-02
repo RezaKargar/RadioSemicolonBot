@@ -32,7 +32,7 @@ jobs:
           pip install -r .pythonanywhere_deploy_scripts/requirements.txt
 
       - name: Install chromedriver for selenium
-        run: sudo apt install chromium-chromedriver
+        run: sudo apt install chromium-chromedriver=80.0.3987.163-0ubuntu1
 
       - name: Replace the secrets
         run: |
