@@ -1,5 +1,6 @@
 from time import sleep
-import requests, json
+import requests
+import json
 from selenium import webdriver
 from pyvirtualdisplay import Display
 
@@ -17,15 +18,16 @@ def Get(api):
     response = requests.get(
         f'{API_ADDRESS}/{PYTHONANYWHERE_USERNAME}/{api}/',
         headers={'Authorization': f'Token {TOKEN}'}
-    ) 
-        
+    )
+
     return json.loads(response.content)
 
-def Post(api, data = None, files = None):
+
+def Post(api, data=None, files=None):
     if not data:
         data = {}
 
-    if files :
+    if files:
         response = requests.post(
             f'{API_ADDRESS}/{PYTHONANYWHERE_USERNAME}/{api}/',
             files=files,
@@ -33,14 +35,15 @@ def Post(api, data = None, files = None):
         )
     else:
         response = requests.post(
-        f'{API_ADDRESS}/{PYTHONANYWHERE_USERNAME}/{api}/',
-        data=data,
-        headers={'Authorization': f'Token {TOKEN}'}
+            f'{API_ADDRESS}/{PYTHONANYWHERE_USERNAME}/{api}/',
+            data=data,
+            headers={'Authorization': f'Token {TOKEN}'}
         )
 
     if response.content:
         return json.loads(response.content)
     return response.content
+
 
 def Delete(api):
     requests.delete(
@@ -48,47 +51,44 @@ def Delete(api):
         headers={'Authorization': f'Token {TOKEN}'}
     )
 
-
-                        ###################
+    ###################
 ########################  Delete old file  #########################
-                        ###################
+    ###################
+
 
 Delete(f'files/path/home/{PYTHONANYWHERE_USERNAME}/{FILE_NAME}')
 
-
-
-                        ###################
+###################
 ########################  Create new file  #########################
-                        ###################
+###################
 
 file_content = ''
 
 with open(f'{FILE_NAME}', 'r') as reader:
     file_content = reader.read()
 
-Post(f'files/path/home/{PYTHONANYWHERE_USERNAME}/{FILE_NAME}', files = {'content': file_content})
+Post(f'files/path/home/{PYTHONANYWHERE_USERNAME}/{FILE_NAME}',
+     files={'content': file_content})
 
-
-                        ####################
+####################
 ######################## Delete old console #########################
-                        ####################
+####################
 
 consoles = Get('consoles')
 
 if len(consoles) > 0:
     Delete(f'consoles/{consoles[-1]["id"]}')
 
-
-                        ####################
+    ####################
 ######################## Create new console #########################
-                        ####################
+    ####################
 
-created_console = Post('consoles', {'executable': 'python3.6', 'arguments': f'{FILE_NAME}', 'working_directory': None})
+created_console = Post('consoles', {
+                       'executable': 'python3.6', 'arguments': f'{FILE_NAME}', 'working_directory': None})
 
-
-                      #########################
+#########################
 ###################### Starting the new console ######################
-                      #########################
+#########################
 
 # In order to the new created console starts to work, it must be opened
 # throw a browser so in the block of code we will open a selenium browser
