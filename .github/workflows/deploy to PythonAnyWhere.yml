@@ -32,7 +32,10 @@ jobs:
           pip install -r .pythonanywhere_deploy_scripts/requirements.txt
 
       - name: Install chromedriver for selenium
-        run: sudo apt install chromium-chromedriver=80.0.3987.163-0ubuntu1
+        run: |
+          sudo apt update
+          sudo apt install snapd=2.44.3+20.04 -y --allow-downgrades
+          sudo snap install chromium
 
       - name: Replace the secrets
         run: |
