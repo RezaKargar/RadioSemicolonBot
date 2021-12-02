@@ -2,6 +2,7 @@ from time import sleep
 import requests
 import json
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 from pyvirtualdisplay import Display
 
 PYTHONANYWHERE_ADDRESS = "https://www.pythonanywhere.com"
@@ -104,13 +105,13 @@ driver.get(f'{PYTHONANYWHERE_ADDRESS}{created_console["console_url"]}')
 sleep(2)
 
 # Providing the credentials on login page and loging-in
-username_input = driver.find_element_by_name("auth-username")
+username_input = driver.find_element(By.NAME, "auth-username")
 username_input.send_keys(PYTHONANYWHERE_USERNAME)
 
-password_input = driver.find_element_by_name("auth-password")
+password_input = driver.find_element(By.NAME, "auth-password")
 password_input.send_keys(PYTHONANYWHERE_PASSWORD)
 
-login_button = driver.find_element_by_id("id_next")
+login_button = driver.find_element(By.ID, "id_next")
 login_button.click()
 sleep(4)
 
