@@ -3,10 +3,10 @@ name: CD to PythonAnyWhere
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
-  
+    branches: [main]
+
   # Triggers the workflow every 12 hour
   schedule:
     - cron: "0 */6 * * *"
@@ -20,26 +20,26 @@ jobs:
     steps:
       # Checks-out the repository under $GITHUB_WORKSPACE, so the job can access it
       - uses: actions/checkout@v2
-      
+
       - name: Set up Python 3.7
         uses: actions/setup-python@v1
         with:
           python-version: 3.7
-      
+
       - name: Install python requirements
         run: |
-         python -m pip install --upgrade pip
-         pip install -r .pythonanywhere_deploy_scripts/requirements.txt
-      
+          python -m pip install --upgrade pip
+          pip install -r .pythonanywhere_deploy_scripts/requirements.txt
+
       - name: Install chromedriver for selenium
         run: sudo apt install chromium-chromedriver
 
       - name: Replace the secrets
         run: |
-         sed -i 's/{{PYTHONANYWHERE_USERNAME}}/${{ secrets.PYTHONANYWHERE_USERNAME }}/g' .pythonanywhere_deploy_scripts/deployToPythonAnyWhere.py
-         sed -i 's/{{PYTHONANYWHERE_PASSWORD}}/${{ secrets.PYTHONANYWHERE_PASSWORD }}/g' .pythonanywhere_deploy_scripts/deployToPythonAnyWhere.py
-         sed -i 's/{{PYTHONANYWHERE_TOKEN}}/${{ secrets.PYTHONANYWHERE_TOKEN }}/g' .pythonanywhere_deploy_scripts/deployToPythonAnyWhere.py
-         sed -i 's/{{BOT_TOKEN}}/${{ secrets.BOT_TOKEN }}/g' RadioSemicolonBot.py
-         
+          sed -i 's/{{PYTHONANYWHERE_USERNAME}}/${{ secrets.PYTHONANYWHERE_USERNAME }}/g' .pythonanywhere_deploy_scripts/deployToPythonAnyWhere.py
+          sed -i 's/{{PYTHONANYWHERE_PASSWORD}}/${{ secrets.PYTHONANYWHERE_PASSWORD }}/g' .pythonanywhere_deploy_scripts/deployToPythonAnyWhere.py
+          sed -i 's/{{PYTHONANYWHERE_TOKEN}}/${{ secrets.PYTHONANYWHERE_TOKEN }}/g' .pythonanywhere_deploy_scripts/deployToPythonAnyWhere.py
+          sed -i 's/{{BOT_TOKEN}}/${{ secrets.BOT_TOKEN }}/g' RadioSemicolonBot.py
+
       - name: Run deployToPythonAnyWhere for actual deploy
         run: python .pythonanywhere_deploy_scripts/deployToPythonAnyWhere.py
