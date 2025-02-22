@@ -21,10 +21,10 @@ jobs:
       # Checks-out the repository under $GITHUB_WORKSPACE, so the job can access it
       - uses: actions/checkout@v2
 
-      - name: Set up Python 3.12.8
+      - name: Set up Python 3.12.9
         uses: actions/setup-python@v1
         with:
-          python-version: 3.12.8
+          python-version: 3.12.9
 
       - name: Install python requirements
         run: |
